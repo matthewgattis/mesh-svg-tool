@@ -364,7 +364,7 @@ void run(const std::vector<std::string> &args)
 
     // Fovy (degrees).
     program.add_argument("--fovy")
-        .help("field of view in degrees, 0 for orthographic")
+        .help("field of view in degrees")
         .default_value(30.0)
         .scan<'g', double>();
 

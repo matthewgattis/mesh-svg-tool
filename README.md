@@ -14,7 +14,7 @@ Designed for pen plotting meshes with clean line output.
 
 ### Features
 
-- Perspective or orthographic projection
+- Perspective projection
 - Hidden surface (edge) elimination
 - Optional back-face culling
 - Configurable output units (mm, cm, in, px)
@@ -119,18 +119,16 @@ Render to SVG:
 ./mesh-svg-tool \
   --fovy 30 \
   --angle-axis -60 1 0 0 \
-  --width 1280 \
-  --height 720 \
-  --distance 10 \
-  --units px \
-  --stroke-width 1 \
+  --width 220 \
+  --height 220 \
+  --distance 15 \
   teapot.ply
 ```
 
 On Windows:
 
 ``` powershell
-.\mesh-svg-tool.exe --fovy 30 --angle-axis -60 1 0 0 --width 1280 --height 720 --distance 10 --units px --stroke-width 1 teapot.ply
+.\mesh-svg-tool.exe --fovy 30 --angle-axis -60 1 0 0 --width 220 --height 220 --distance 15 teapot.ply
 ```
 
 Output file defaults to:
@@ -165,13 +163,11 @@ Usage: mesh-svg-tool [options] mesh_filename
 
 | Option         | Description                                 | Default   |
 | -------------- | ------------------------------------------- | --------- |
-| `--fovy`       | Field of view (degrees). `0` = orthographic | `30`      |
+| `--fovy`       | Field of view (degrees)                     | `30`      |
 | `--distance`   | Translate model along −Z                    | `10`      |
 | `--angle-axis` | Rotation: angle (deg) + axis (x y z)        | `0 1 0 0` |
 
-#### `--angle-axis` Note
-
-> The axis vector does not need to be provided normalized. It will be normalized internally before constructing the rotation.
+> `--angle-axis` note: Axis vector does not need to be provided normalized. It will be normalized internally before constructing the rotation.
 
 
 ### Rendering Controls
