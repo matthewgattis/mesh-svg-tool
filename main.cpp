@@ -27,10 +27,10 @@
 #include "clip_openmesh.hpp"
 #include "mesh.hpp"
 
-using Polyline = std::vector<glm::dvec2>;
+using Polyline2D = std::vector<glm::dvec2>;
 
 void render_svg(
-    const std::vector<Polyline> &polylines,
+    const std::vector<Polyline2D> &polylines,
     const std::string &svg_filename,
     double width,
     double height,
@@ -55,7 +55,7 @@ void render_svg(
     ofs << "</svg>" << std::endl;
 }
 
-std::vector<Polyline> get_polylines(Mesh4 &clip_mesh, double step)
+std::vector<Polyline2D> get_polylines(Mesh4 &clip_mesh, double step)
 {
     Mesh4 &mesh = clip_mesh;
 
@@ -125,7 +125,7 @@ std::vector<Polyline> get_polylines(Mesh4 &clip_mesh, double step)
 
     BVH bvh = BVHBuilder::build(mesh);
 
-    std::vector<Polyline> polylines;
+    std::vector<Polyline2D> polylines;
 
     for (const auto &halfedge_polyline : halfedge_polylines)
     {

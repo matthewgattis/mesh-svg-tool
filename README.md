@@ -76,9 +76,7 @@ cmake --build build
 
 ### Windows (MSVC + vcpkg)
 
-#### Visual Studio Developer Prompt
-
-Open "x64 Native Tools Command Prompt for VS."
+Open PowerShell.
 
 ``` powershell
 git clone https://github.com/matthewgattis/mesh-svg-tool.git
