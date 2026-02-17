@@ -1,12 +1,24 @@
 # mesh-svg-tool
 
-Render mesh as wireframe to SVG. Made for pen plotting meshes with hidden surface (edge) elemination.
+Render a 3D mesh as a wireframe SVG, with optional hidden surface (edge) elimination.
+
+Designed for pen plotting meshes with clean line output.
+
+## Example Output
 
 ![](docs/teapot.svg)
-*Utah Teapot wireframe. [Inkscape](https://inkscape.org/) modified output. See [examples/output.svg](examples/output.svg) for tool output.*
+*Utah Teapot wireframe. [Inkscape](https://inkscape.org/)-modified output. See [examples/output.svg](examples/output.svg) for raw tool output.*
 
 ![](docs/DSC07810-3.jpg)
 *Utah Teapot, pen on paper. Draw by [Creality Ender-3 V3 KE.](https://www.creality.com/products/creality-ender-3-v3-ke) Image edited in [Adobe Lightroom.](https://lightroom.adobe.com/)*
+
+### Features
+
+- Perspective or orthographic projection
+- Hidden surface (edge) elimination
+- Optional back-face culling
+- Configurable output units (mm, cm, in, px)
+- Designed for pen plotters / CNC drawing workflows
 
 ## Getting Started
 
@@ -14,56 +26,168 @@ Render mesh as wireframe to SVG. Made for pen plotting meshes with hidden surfac
 
 - CMake https://cmake.org/
 - vcpkg https://github.com/microsoft/vcpkg
-    - Manually clone and bootstrap vcpkg according to instructions.
     - https://learn.microsoft.com/en-us/vcpkg/get_started/get-started?pivots=shell-cmd
+    - Clone and bootstrap `vcpkg` according to Microsoft's instructions.
+  
+## Building
 
-### Building (\*NIX)
-
-``` sh
-$ git clone https://github.com/matthewgattis/mesh-svg-tool.git
-$ cd cl-renderer/
-```
-
-- Adjust `tools/configure.sh` as needed.
+### Linux / macOS
 
 ``` sh
-$ mkdir build/
-$ cd build/
-$ ../tools/configure.sh ../
-$ cmake --build . -j
+git clone https://github.com/matthewgattis/mesh-svg-tool.git
+cd mesh-svg-tool
+
+mkdir -p build
+cmake -S . -B build \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
+  -DVCPKG_TARGET_TRIPLET=x64-linux
+
+cmake --build build -j
 ```
 
-### Render Example Image
-
-``` sh
-$ wget https://raw.githubusercontent.com/gnomeby/canvas3D/refs/heads/master/teapot.ply -O teapot.ply
-$ ./mesh-svg-tool --fovy 30 --angle-axis -60 1 0 0 --width 1280.0 --height 720.0 --distance 10 --units "px" --stroke-width 1 teapot.ply
+#### Binary (usually) ends up at:
+```
+./build/mesh-svg-tool
 ```
 
-### More
+#### Notes
+- Set `VCPKG_ROOT` to your vcpkg clone path, e.g.
+```
+export VCPKG_ROOT="$HOME/src/vcpkg"
+```
+- On macOS, you'll likely want:
+```
+-DVCPKG_TARGET_TRIPLET=x64-osx
+```
+- Or Apple Silicon:
+```
+-DVCPKG_TARGET_TRIPLET=arm64-osx
+```
+- Or Ninja:
+``` bash
+cmake -S .. -B build -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
+  -DVCPKG_TARGET_TRIPLET=x64-linux
 
-- Use `--help` for more information:
+cmake --build build
+```
+
+### Windows (MSVC + vcpkg)
+
+#### Visual Studio Developer Prompt
+
+Open "x64 Native Tools Command Prompt for VS."
+
+``` powershell
+git clone https://github.com/matthewgattis/mesh-svg-tool.git
+cd mesh-svg-tool
+mkdir build
+cd build
+```
+
+Configure with vcpkg toolchain:
+
+``` powershell
+cmake -S .. -B . `
+  -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake `
+  -DVCPKG_TARGET_TRIPLET=x64-windows
+```
+
+Build:
 
 ```
-$ ./mesh-svg-tool --help
-Usage: mesh-svg-tool [--help] [--version] [--svg VAR] [--fovy VAR] [--width VAR] [--height VAR] [--units VAR] [--distance VAR] [--angle-axis VAR...] [--no-hidden-surface-elimination] [--hse-step VAR] [--do-back-face-culling] [--stroke-width VAR] [--debug] mesh_filename
-
-Positional arguments:
-  mesh_filename                    mesh file to load [required]
-
-Optional arguments:
-  -h, --help                       shows help message and exits 
-  -v, --version                    prints version information and exits 
-  --svg                            output file svg [nargs=0..1] [default: "output.svg"]
-  --fovy                           field of view in degrees, 0 for orthographic [nargs=0..1] [default: 30]
-  --width                          output image width [nargs=0..1] [default: 210]
-  --height                         output image height [nargs=0..1] [default: 297]
-  --units                          units for width and height (e.g., mm, cm, in, px) [nargs=0..1] [default: "mm"]
-  --distance                       distance to translate the model away from the camera (along -Z axis in view space) [nargs=0..1] [default: 10]
-  --angle-axis                     rotate the model by angle (degrees) and axis (x, y, z) [nargs=0..4] [default: {0 1 0 0}]
-  --no-hidden-surface-elimination  disable hidden surface elimination 
-  --hse-step                       step size for hidden surface elimination [nargs=0..1] [default: 0.01]
-  --do-back-face-culling           enable back-face culling 
-  --stroke-width                   stroke width in units [nargs=0..1] [default: 0.5]
-  --debug                          enable debug output
+cmake --build . --config Release
 ```
+
+Binary will be located in:
+
+```
+build/Release/mesh-svg-tool.exe
+```
+
+## Render Example
+
+Download a sample mesh:
+
+``` bash
+wget https://raw.githubusercontent.com/gnomeby/canvas3D/refs/heads/master/teapot.ply -O teapot.ply
+```
+
+Render to SVG:
+
+``` bash
+./mesh-svg-tool \
+  --fovy 30 \
+  --angle-axis -60 1 0 0 \
+  --width 1280 \
+  --height 720 \
+  --distance 10 \
+  --units px \
+  --stroke-width 1 \
+  teapot.ply
+```
+
+On Windows:
+
+``` powershell
+.\mesh-svg-tool.exe --fovy 30 --angle-axis -60 1 0 0 --width 1280 --height 720 --distance 10 --units px --stroke-width 1 teapot.ply
+```
+
+Output file defaults to:
+
+```
+output.svg
+```
+
+## Command Line Options
+
+``` pgsql
+Usage: mesh-svg-tool [options] mesh_filename
+```
+
+### Positional
+
+| Argument        | Description                  |
+| --------------- | ---------------------------- |
+| `mesh_filename` | Mesh file to load (required) |
+
+### Output
+
+| Option           | Description            | Default      |
+| ---------------- | ---------------------- | ------------ |
+| `--svg`          | Output SVG filename    | `output.svg` |
+| `--width`        | Output width           | `210`        |
+| `--height`       | Output height          | `297`        |
+| `--units`        | Units (mm, cm, in, px) | `mm`         |
+| `--stroke-width` | Stroke width in units  | `0.5`        |
+
+### Camera
+
+| Option         | Description                                 | Default   |
+| -------------- | ------------------------------------------- | --------- |
+| `--fovy`       | Field of view (degrees). `0` = orthographic | `30`      |
+| `--distance`   | Translate model along −Z                    | `10`      |
+| `--angle-axis` | Rotation: angle (deg) + axis (x y z)        | `0 1 0 0` |
+
+#### `--angle-axis` Note
+
+> The axis vector does not need to be provided normalized. It will be normalized internally before constructing the rotation.
+
+
+### Rendering Controls
+
+| Option                            | Description                              |
+| --------------------------------- | ---------------------------------------- |
+| `--no-hidden-surface-elimination` | Disable hidden surface elimination       |
+| `--hse-step`                      | Step size for hidden surface elimination |
+| `--do-back-face-culling`          | Enable back-face culling                 |
+| `--debug`                         | Enable debug output                      |
+
+## Pen Plotting Notes
+
+- Use --units mm for physical plotting.
+- Match output size to your printer bed.
+- Adjust --stroke-width for pen thickness.
+- Consider post-processing in Inkscape for layout tweaks.
